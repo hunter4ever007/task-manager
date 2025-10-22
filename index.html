@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Daily Tasks</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#6200ee">
+    <meta name="description" content="A professional task management app to organize your daily tasks">
+
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Task Manager">
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16x16.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/calendar.css">
+    <link rel="stylesheet" href="css/categories.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="app-title" data-i18n="app.title">Task Manager</h1>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme">
+                    <i class="material-icons">dark_mode</i>
+                </button>
+                <button id="lang-toggle" class="icon-btn" aria-label="Toggle language">
+                    <span id="lang-text">🇺🇸</span>
+                </button>
+                <button id="menu-toggle" class="icon-btn mobile-only" aria-label="Toggle menu">
+                    <i class="material-icons">menu</i>
+                </button>
+            </div>
+        </header>
+
+        <div class="app-content">
+            <!-- Sidebar -->
+            <aside class="sidebar desktop-only" id="sidebar">
+                <div class="sidebar-content">
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <i class="material-icons">account_circle</i>
+                        </div>
+                        <div class="user-info">
+                            <h3 data-i18n="user.greeting">Welcome</h3>
+                            <p id="current-date"></p>
+                        </div>
+                    </div>
+
+                    <nav class="main-nav">
+                        <ul>
+                            <li>
+                                <a href="#" class="nav-item active" data-view="tasks">
+                                    <i class="material-icons">assignment</i>
+                                    <span data-i18n="nav.tasks">Tasks</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-item" data-view="calendar">
+                                    <i class="material-icons">calendar_today</i>
+                                    <span data-i18n="nav.calendar">Calendar</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-item" data-view="categories">
+                                    <i class="material-icons">category</i>
+                                    <span data-i18n="nav.categories">Categories</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-item" data-view="settings">
+                                    <i class="material-icons">settings</i>
+                                    <span data-i18n="nav.settings">Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="backup-section">
+                        <button id="backup-btn" class="btn btn-outline">
+                            <i class="material-icons">backup</i>
+                            <span data-i18n="backup.manual">Backup Now</span>
+                        </button>
+                        <p class="backup-info" id="backup-info">
+                            <span data-i18n="backup.last">Last backup:</span> 
+                            <span id="last-backup-date">Never</span>
+                        </p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Tasks View -->
+                <section id="tasks-view" class="view active">
+                    <div class="view-header">
+                        <h2 data-i18n="tasks.title">My Tasks</h2>
+                        <div class="task-controls">
+                            <div class="search-box">
+                                <i class="material-icons">search</i>
+                                <input type="text" id="task-search" placeholder="Search tasks..." data-i18n-placeholder="tasks.search">
+                            </div>
+                            <select id="filter-category" class="filter-select">
+                                <option value="all" data-i18n="filter.allCategories">All Categories</option>
+                                <option value="work" data-i18n="category.work">Work</option>
+                                <option value="personal" data-i18n="category.personal">Personal</option>
+                                <option value="urgent" data-i18n="category.urgent">Urgent</option>
+                            </select>
+                            <select id="filter-status" class="filter-select">
+                                <option value="all" data-i18n="filter.allStatus">All Status</option>
+                                <option value="pending" data-i18n="status.pending">Pending</option>
+                                <option value="completed" data-i18n="status.completed">Completed</option>
+                            </select>
+                            <button id="add-task-btn" class="btn btn-primary">
+                                <i class="material-icons">add</i>
+                                <span data-i18n="tasks.add">Add Task</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-bar-container">
+                            <div class="progress-info">
+                                <span data-i18n="progress.completed">Completed</span>
+                                <span id="progress-percentage">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="progress-fill" class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tasks-container" id="tasks-container">
+                        <!-- Tasks will be dynamically added here -->
+                    </div>
+                </section>
+
+                <!-- Calendar View -->
+                <section id="calendar-view" class="view">
+                    <div class="view-header">
+                        <h2 data-i18n="calendar.title">Calendar</h2>
+                    </div>
+                    <div class="calendar-container" id="calendar-container">
+                        <!-- Calendar will be dynamically generated here -->
+                    </div>
+                </section>
+
+                <!-- Categories View -->
+                <section id="categories-view" class="view">
+                    <div class="view-header">
+                        <h2 data-i18n="categories.title">Categories</h2>
+                        <button id="add-category-btn" class="btn btn-primary">
+                            <i class="material-icons">add</i>
+                            <span data-i18n="categories.add">Add Category</span>
+                        </button>
+                    </div>
+                    <div class="categories-container" id="categories-container">
+                        <!-- Categories will be dynamically added here -->
+                    </div>
+                </section>
+
+                <!-- Settings View -->
+                <section id="settings-view" class="view">
+                    <div class="view-header">
+                        <h2 data-i18n="settings.title">Settings</h2>
+                    </div>
+                    <div class="settings-container">
+                        <div class="setting-group">
+                            <h3 data-i18n="settings.notifications">Notifications</h3>
+                            <div class="setting-item">
+                                <label for="enable-notifications" data-i18n="settings.enableNotifications">Enable Notifications</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="enable-notifications">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label for="notification-sound" data-i18n="settings.notificationSound">Notification Sound</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="notification-sound" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <h3 data-i18n="settings.backup">Backup Settings</h3>
+                            <div class="setting-item">
+                                <label for="auto-backup" data-i18n="settings.autoBackup">Automatic Backup</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="auto-backup">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label for="backup-frequency" data-i18n="settings.backupFrequency">Backup Frequency</label>
+                                <select id="backup-frequency">
+                                    <option value="daily" data-i18n="frequency.daily">Daily</option>
+                                    <option value="weekly" data-i18n="frequency.weekly">Weekly</option>
+                                    <option value="monthly" data-i18n="frequency.monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <button id="restore-backup-btn" class="btn btn-outline">
+                                <i class="material-icons">restore</i>
+                                <span data-i18n="settings.restoreBackup">Restore Backup</span>
+                            </button>
+                            <input type="file" id="restore-backup-file" accept=".json" style="display: none;">
+                        </div>
+
+                        <div class="setting-group">
+                            <h3 data-i18n="settings.data">Data Management</h3>
+                            <button id="export-data-btn" class="btn btn-outline">
+                                <i class="material-icons">download</i>
+                                <span data-i18n="settings.exportData">Export Data</span>
+                            </button>
+                            <button id="clear-data-btn" class="btn btn-danger">
+                                <i class="material-icons">delete_forever</i>
+                                <span data-i18n="settings.clearData">Clear All Data</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="mobile-nav mobile-only">
+            <a href="#" class="nav-item active" data-view="tasks">
+                <i class="material-icons">assignment</i>
+                <span data-i18n="nav.tasks">Tasks</span>
+            </a>
+            <a href="#" class="nav-item" data-view="calendar">
+                <i class="material-icons">calendar_today</i>
+                <span data-i18n="nav.calendar">Calendar</span>
+            </a>
+            <a href="#" class="nav-item" data-view="categories">
+                <i class="material-icons">category</i>
+                <span data-i18n="nav.categories">Categories</span>
+            </a>
+            <a href="#" class="nav-item" data-view="settings">
+                <i class="material-icons">settings</i>
+                <span data-i18n="nav.settings">Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="task-modal-title" data-i18n="task.addNew">Add New Task</h3>
+                <button class="close-btn" id="close-task-modal">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="task-form">
+                    <div class="form-group">
+                        <label for="task-title" data-i18n="task.title">Task Title</label>
+                        <input type="text" id="task-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-description" data-i18n="task.description">Description</label>
+                        <textarea id="task-description" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-category" data-i18n="task.category">Category</label>
+                            <select id="task-category">
+                                <option value="work" data-i18n="category.work">Work</option>
+                                <option value="personal" data-i18n="category.personal">Personal</option>
+                                <option value="urgent" data-i18n="category.urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-priority" data-i18n="task.priority">Priority</label>
+                            <select id="task-priority">
+                                <option value="low" data-i18n="priority.low">Low</option>
+                                <option value="medium" data-i18n="priority.medium">Medium</option>
+                                <option value="high" data-i18n="priority.high">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-date" data-i18n="task.dueDate">Due Date</label>
+                            <input type="date" id="task-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="task-time" data-i18n="task.dueTime">Due Time</label>
+                            <input type="time" id="task-time">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-reminder" data-i18n="task.reminder">Reminder</label>
+                        <select id="task-reminder">
+                            <option value="none" data-i18n="reminder.none">None</option>
+                            <option value="ontime" data-i18n="reminder.onTime">On Time</option>
+                            <option value="5min" data-i18n="reminder.fiveMin">5 Minutes Before</option>
+                            <option value="15min" data-i18n="reminder.fifteenMin">15 Minutes Before</option>
+                            <option value="30min" data-i18n="reminder.thirtyMin">30 Minutes Before</option>
+                            <option value="1hour" data-i18n="reminder.oneHour">1 Hour Before</option>
+                            <option value="1day" data-i18n="reminder.oneDay">1 Day Before</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancel-task-btn">
+                            <span data-i18n="common.cancel">Cancel</span>
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="save-task-btn">
+                            <span data-i18n="common.save">Save</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="category-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="category-modal-title" data-i18n="category.addNew">Add New Category</h3>
+                <button class="close-btn" id="close-category-modal">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="category-form">
+                    <div class="form-group">
+                        <label for="category-name" data-i18n="category.name">Category Name</label>
+                        <input type="text" id="category-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category-color" data-i18n="category.color">Color</label>
+                        <div class="color-picker">
+                            <input type="radio" id="color-red" name="category-color" value="#F44336">
+                            <label for="color-red" class="color-option" style="background-color: #F44336;"></label>
+
+                            <input type="radio" id="color-pink" name="category-color" value="#E91E63">
+                            <label for="color-pink" class="color-option" style="background-color: #E91E63;"></label>
+
+                            <input type="radio" id="color-purple" name="category-color" value="#9C27B0">
+                            <label for="color-purple" class="color-option" style="background-color: #9C27B0;"></label>
+
+                            <input type="radio" id="color-indigo" name="category-color" value="#3F51B5">
+                            <label for="color-indigo" class="color-option" style="background-color: #3F51B5;"></label>
+
+                            <input type="radio" id="color-blue" name="category-color" value="#2196F3">
+                            <label for="color-blue" class="color-option" style="background-color: #2196F3;"></label>
+
+                            <input type="radio" id="color-teal" name="category-color" value="#009688">
+                            <label for="color-teal" class="color-option" style="background-color: #009688;"></label>
+
+                            <input type="radio" id="color-green" name="category-color" value="#4CAF50">
+                            <label for="color-green" class="color-option" style="background-color: #4CAF50;"></label>
+
+                            <input type="radio" id="color-yellow" name="category-color" value="#FFC107">
+                            <label for="color-yellow" class="color-option" style="background-color: #FFC107;"></label>
+
+                            <input type="radio" id="color-orange" name="category-color" value="#FF9800">
+                            <label for="color-orange" class="color-option" style="background-color: #FF9800;"></label>
+
+                            <input type="radio" id="color-brown" name="category-color" value="#795548">
+                            <label for="color-brown" class="color-option" style="background-color: #795548;"></label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancel-category-btn">
+                            <span data-i18n="common.cancel">Cancel</span>
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="save-category-btn">
+                            <span data-i18n="common.save">Save</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="material-icons" id="toast-icon">info</i>
+            <span id="toast-message"></span>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/translations.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/backup.js"></script>
+    <script src="js/app-new.js"></script>
+    <script src="js/app-new-continued.js"></script>
+    <script src="js/app-new-final.js"></script>
+</body>
+</html>
